@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+      integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+        <h1>Chat app</h1>
+        <div class="Screen">
+            <div class="output"></div>
+            <div class="feedback"></div>
+        </div>
+        <div class="inputField">
+
+            <input type="text" placeholder="Name" class="name"><br>
+            <input type="text" placeholder="message" class="message"><br>
+            <button type="submit" class="send">Send</button>
+        </div>
+
+    </div>
+    <script>
+        const socket = io("http://localhost:3000");
+      let output = document.querySelector(".output");
+      let message = document.querySelector(".message")
+      let feedback = document.querySelector(".feedback")
+
+      let name = document.querySelector(".name")
+      let send = document.querySelector(".send")
+
+      message.addEventListener("keypress",()=>{
+        socket.emit("typing",name.value)
+      })
+      send.addEventListener("click",()=>{
+        let data = {
+            name: name.value,
+            message:message.value,
+        }
+        socket.emit("chat",data)
+        message.value="";
+    });
+
+
+    socket.on("chat",(data)=>{
+        output.innerHTML += `<p class="sentMessage"><strong class="senderName">${data.name}:</strong>    ${data.message}</p>`
+    })
+
+
+    socket.on("typing",(name)=>{
+        console.log("name")
+         feedback.innerHTML = `<em>${name}</em> is typing....`
+        setTimeout(() => {
+            feedback.innerHTML=""
+        }, 3000);
+    })
+      </script>
+      </body>
+</html>
